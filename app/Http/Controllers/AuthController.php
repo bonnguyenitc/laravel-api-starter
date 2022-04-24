@@ -23,7 +23,6 @@ class AuthController extends Controller
     public function register(RegisterRequest
     $request)
     {
-        $request->validated();
         $user = User::create([
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -35,7 +34,6 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        $request->validated();
         $user = User::where('email', $request->email)->first();
         if (!$user || !Hash::check($request->password, $user->password)) {
             return Utils::generateResponse(false, Messages::MSG_AUTH["credentials_incorrect"], HttpStatusCode::HTTP_UNPROCESSABLE_ENTITY);
@@ -83,7 +81,6 @@ class AuthController extends Controller
 
     public function forgotPassword(ForgotPasswordRequest $request)
     {
-        $request->validated();
         $validated = $request->safe()->only(['email']);
 
         $user = User::where("email", $validated["email"])->first();
@@ -94,8 +91,6 @@ class AuthController extends Controller
 
     public function resetPassword(ResetPasswordRequest $request, $token)
     {
-        $request->validated();
-
         $validated = $request->safe()->only(['password']);
 
         $accessToken = PersonalAccessToken::findToken($token);
