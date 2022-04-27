@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use App\Library\HttpStatusCode;
 use App\Library\Messages;
 use App\Library\Utils;
+use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -50,13 +51,15 @@ class Handler extends ExceptionHandler
             //
         });
 
-        $this->renderable(function (\Illuminate\Auth\AuthenticationException $e, $request) {
+        $this->renderable(function (Exception $e, $request) {
             if ($request->is('api/*')) {
-                return Utils::generateResponse(
-                    false,
-                    Messages::MSG_AUTH["not_authenticated"],
-                    HttpStatusCode::HTTP_UNAUTHORIZED
-                );
+                if ($e instanceof \Illuminate\Auth\AuthenticationException)
+                    return Utils::generateResponse(
+                        false,
+                        Messages::MSG_AUTH["not_authenticated"],
+                        HttpStatusCode::HTTP_UNAUTHORIZED
+                    );
+                // register any catch exception here
             }
         });
     }
